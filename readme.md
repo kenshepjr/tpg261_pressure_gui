@@ -15,6 +15,7 @@ A Python-based GUI application for interfacing with the Pfieffer TPG261 Single G
 
 ### Hardware
 - Pfieffer TPG261 Single Gauge vacuum controller
+    - we use a PKR 251 Combo gauge (manual included)
 - Serial/USB connection to the controller
 
 ### Software Dependencies
@@ -29,7 +30,7 @@ pyserial
 
 1. Clone this repository:
 ```bash
-git clone https://github.com/yourusername/tpg261-controller.git
+git clone https://github.com/kenshepjr/tpg261_pressure_gui
 cd tpg261-controller
 ```
 
@@ -53,6 +54,7 @@ ports['TPG261'] = 'COM23'  # Update with your actual port
 ```bash
 python cont_TPG261_Single_Pfieffer_Gauge_V3.py
 ```
+4. Requires the mod_Pfieffer_TPG261.py in the same directory as the main program
 
 ### GUI Components
 
@@ -136,6 +138,26 @@ Expected controllers:
 - BKP_Arb_Waveform_Controller
 - Ircon_Modline_Plus_Controller
 
+To run standalone, comment, or delete this section of code out lines 233 through 248 
+```python
+    with open('controller_ready.txt', 'a') as f:
+        f.write('TPG261_Controller is ready\n')
+        
+    # waiting for all controllers to be ready
+    expected_controllers = ['Substrate_Heater_Controller', 'TPG261_Controller', 'MKS_Pressure_Controller', 'BKP_Arb_Waveform_Controller', 'Ircon_Modline_Plus_Controller']
+    ready = False
+    
+    while not ready:
+        with open('controller_ready.txt', 'r') as f:
+            lines = f.readlines()
+            
+        ready = all(f'{controller} is ready\n' in lines for controller in expected_controllers)
+        
+        if not ready:
+            print('Waiting for all controllers to be ready')
+            time.sleep(0.01)
+```
+
 ## Error Handling
 
 The application handles common error conditions:
@@ -157,13 +179,6 @@ The application handles common error conditions:
 - Stop bits: 1
 - Timeout: 1 second
 
-## Contributing
-
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/new-feature`)
-3. Commit your changes (`git commit -am 'Add new feature'`)
-4. Push to the branch (`git push origin feature/new-feature`)
-5. Create a Pull Request
 
 ## License
 
@@ -181,9 +196,6 @@ Kenneth Shepherd Jr
 
 ## Support
 
-For issues, questions, or contributions, please open an issue on the GitHub repository or contact the author.
+1) For issues, questions, or contributions, please open an issue on the GitHub repository or contact the author.
+2) The manual's to the controller and the pressure gauge are in the manuals directory. 
 
-## Acknowledgments
-
-- Pfieffer Vacuum for TPG261 documentation and protocol specifications
-- Python community for excellent scientific computing libraries
